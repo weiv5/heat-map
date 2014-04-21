@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>heat map</title>
+<script type="text/javascript" src="syntaxHighlighter/shCore.js"></script>
+<script type="text/javascript" src="syntaxHighlighter/shBrushJScript.js"></script>
+<link type="text/css" rel="stylesheet" href="syntaxHighlighter/shCoreDefault.css"/>
+<script type="text/javascript">SyntaxHighlighter.all();</script>
+
+
+<SCRIPT src="../jquery.min.js" type=text/javascript></SCRIPT>
+<SCRIPT src="../heat-map-v0.4.0.js" type=text/javascript></SCRIPT>
+
+<style>
+.tabs{height:30px;}
+.tab{font-weight:0;color:#aaa;text-decoration:none;font-size:20px;}
+.current{font-weight:700;color:#000;text-decoration:underline;}
+a {text-decoration: none;}
+
+.items{margin-top:30px;}
+ul {list-style: none outside none;}
+ul li {float: left;padding: 0 13px;}
+.item{clear:both;margin-top:30px;}
+</style>
+
+<script>
+$(document).ready(function(){
+    var options = {
+    data:
+    [
+        {
+            "title":"金额",
+            "data":{16:100, 20:{235:100, 236:200}},
+        },
+        {
+            "title":"数量",
+            "data":{16:50, 20:{235:100, 236:100}},
+        }
+    ],
+    };
+    var map = $("#ChinaMap").heatmap(options, 1);
+
+    $(".tab").click(function(){
+        $(".item").css("display", "none");
+        $("#"+$(this).attr("rel")).css("display", "");
+        $(".tab").removeClass("current");
+        $(this).addClass("current");
+    });
+});
+</script>
+</head>
+<body style="background: white; font-family: Helvetica">
+
+<div class="tabs">
+<ul>
+<li><a href="javascript:;" class="tab current" rel="use">use</a></li>
+<li><a href="javascript:;" class="tab" rel="option">option</a></li>
+<li><a href="javascript:;" class="tab" rel="function">function</a></li>
+</ul>
+</div>
+
+<div class="items">
+<div id="use" class="item">
+<script type="syntaxhighlighter" class="brush: js">
+//<DIV id=ChinaMap style="width:1000px;height:600px;"></DIV>
+
+//<script src="jquery.min.js">
+//<script src="heat-map-v0.4.0.js">
+
+var options = {
+    data:[
+        {
+            "title":"金额",
+            "data":{16:100, 20:{235:100, 236:200}},
+        },
+        {
+            "title":"数量",
+            "data":{16:50, 20:{235:100, 236:100}},
+        }
+    ],
+};
+var map = $("#ChinaMap").heatmap(options, 1);
+</script>
+<DIV id=ChinaMap style="width:1000px;height:600px;"></DIV>
+</div>
+
+<div id="option" class="item" style="display:none">
+<script type="syntaxhighlighter" class="brush: js">
+var defaultOptions = {
+    map:{
+        plate:{
+            "stroke":"#dddddd",                 //地图板块边框颜色
+            "stroke-width": 1,                  //地图板块边框宽度
+        },
+        txt:{
+            "size":9,                           //地图文字字号
+            "font-family":"",                   //地图文字字体
+            "font-weight":"",                   //地图文字粗细
+            "fill":"#333"                       //地图文字颜色
+        },
+        select:{
+            "stroke":"orange",                  //mouseover板块边框颜色
+            "stroke-width": 2,                  //mouseover板块边框宽度
+        },
+        mouseover: null,                        //mouseover板块时用户自定义回调方法,参数: event, region_id, region_name, legend_index
+        mouseout: null,                         //mouseout板块时用户自定义回调方法,参数: event, region_id, region_name, legend_index
+        click: null,                            //click板块用户自定义回调方法,参数: event, region_id, region_name, legend_index, goin
+        shadow: "#555"                          //选中标尺时其他板块颜色
+    },
+    legend:{
+        on:{                                    //legend选中时字体样式
+            "fill":"#274b6d",                   
+            "font-size":9,
+            "cursor":""
+        },
+        off:{                                   //legend未选中字体样式
+            "fill":"#ccc",
+            "cursor":"pointer",
+            "font-size":9,
+        },
+        wall:{                                  //legend容器样式
+            "fill":"#fff",
+            "stroke":"#ccc",
+            "stroke-width": 1
+        },
+        show: null                              //legend选中时用户自定义回调方法,参数: index
+    },
+    ruler:{
+        share: {                                //共享标尺
+            "enable": false,
+            "fill": "",
+            "format": function(num){return num;}
+        },
+        txt: {                                  //标尺样式
+            "font-size": 9,
+            "fill": "#000"
+        },
+        setp: 10,                               //标尺分级
+        "align": "right",                       //标尺水平位置,left/right
+        "v-align": "top"                        //标尺垂直位置,top/bottom
+    },
+    wall: {                                     //背景样式
+        stroke:"none",
+        fill:"rgba(255,255,255,0)"
+    },
+    animate: {                                  //legend自动切换频率,点击背景部分开启或停止切换,单位秒,默认不切换
+        "roll-sec": 0
+    },
+    data:[                                      //填充数据
+        {
+            "title":"金额",                      //设置legend标题,必填
+            "data":{16:100, 20:{235:100, 236:200},  //数据,二维结构时,可点击进入市级地图,必填
+            "format":null,                      //标尺格式化,与ruler.share.format冲突
+            "fill":null                         //自定义填充颜色,与ruler.share.fill冲突
+        },
+        {
+            "title":"数量",
+            "data":{16:100, 20:{235:100, 236:200},
+            "format":null,
+            "fill":null
+        }
+    ]
+};
+</script>
+</div>
+
+
+<div id="function" class="item" style="display:none">
+<script type="syntaxhighlighter" class="brush: js">
+map.redraw(options);                            //重画地图,若地图已经存在,想改变div尺寸,地图样式或重新填充数据时可调用此方法重新绘制
+map.show(index);                                //切换至某个legend
+</script>
+</div>
+
+</div>
+
+</html>
