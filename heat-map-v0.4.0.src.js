@@ -1,10 +1,3 @@
-/**
- * 中国省市级热点地图
- * 
- * @author weiwei@xiaomi.com
- * @version 0.4.0
- */
-
 (function($) {
 var initcolor = "#ffffff";
 
