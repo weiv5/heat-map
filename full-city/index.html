@@ -1,0 +1,93 @@
+<meta charset="utf-8">
+<script src="d3.js"></script>
+<script src="raphael.min.js"></script>
+<script src="jquery.min.js"></script>
+
+<script>
+window.onload = function(){
+    var canvas = document.getElementById("map");
+    var paper = new Raphael(canvas, 1200, 1000);
+
+    var projection = d3.geo.albers().origin([105, 30.5]).scale(4000);
+    var getAreaPath = d3.geo.path().projection(projection);
+
+    paper.setViewBox(-1174.6445229087194, -1437.3577680805693, 3039.3970214233723, 2531.19589698184, true);
+
+    var colors = d3.scale.linear()
+        .domain([0, 100])
+        .range(["#ffffff", "orange"]);
+
+    d3.json("data/map.js", function(json) {
+        json.features.forEach(function(d) {
+            var state = paper.path(getAreaPath(d));
+            state.attr({
+                "fill": colors(parseInt(d.id)),
+                "stroke": "#aaa"
+            }).toBack();
+        });
+    });
+
+
+    var tooltip = $("<div/>").css({
+            "border": "1px solid",
+            "border-color": $.browser.msie ? "rgb(0, 0, 0)" : "rgba(0, 0, 0, 0.8)",
+            "background-color": $.browser.msie ? "rgb(0, 0, 0)" : "rgba(0, 0, 0, 0.75)",
+            "color": "white",
+            "border-radius": "2px",
+            "padding": "12px 8px",
+            "font-size": "12px",
+            "box-shadow": "3px 3px 6px 0px rgba(0,0,0,0.58)",
+            "font-familiy": "宋体",
+            "z-index": 1000,
+            "text-align": "center",
+            "visibility": "hidden",
+            "position": "absolute"
+        });
+    $("#map").append(tooltip);
+    
+    d3.json("data/point.js", function(json){
+        for (var i in json) {
+            (function(city) {
+                var loc = projection(city.loc);
+                paper.circle(loc[0], loc[1], 15)
+                    .attr({
+                        "fill": "steelblue",
+                        "fill-opacity": 0.5,
+                    })
+                    .mouseover(function(){
+                        this.attr({"r": 30});
+                        tooltip.html(city.fullName).css("visibility", "visible");;
+                    })
+                    .mouseout(function(){
+                        this.attr({"r": 15});
+                        tooltip.css("visibility", 'hidden');
+                    })
+                    .mousemove(function (e) {
+                        var offset = tooltip.offset();
+                        if (!(e.pageX && e.pageY)) {
+                            return false;
+                        }
+                        var x = e.pageX,
+                            y = e.pageY,
+                            width =  tooltip.outerWidth ? tooltip.outerWidth() : tooltip.width(),
+                            height =  tooltip.outerHeight ? tooltip.outerHeight() : tooltip.height(),
+                            mouseToNode = 15;
+                        if (width + x + 2 * mouseToNode <=  $(canvas).width()) {
+                            x += mouseToNode;
+                        } else {
+                            x = x - width - mouseToNode;
+                        }   
+                        if (y >= height + mouseToNode) {
+                            y = y - mouseToNode - height;
+                        } else {
+                            y += mouseToNode;
+                        }
+                        tooltip.css("left",  x); 
+                        tooltip.css("top",  y); 
+                    });
+            })(json[i]);
+        }
+    });
+};
+</script>
+<div id="map"></div>
