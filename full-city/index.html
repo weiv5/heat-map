@@ -121,9 +121,6 @@ window.onload = function(){
         });
     }
     
-    flashPoint(20, true);
-    flashPoint(21, true);
-    flashPoint(300, true);
     new p2p(1, 2);
     new p2p(1, 50);
     new p2p(1, 100);
@@ -133,6 +130,11 @@ window.onload = function(){
     setTimeout(function(){
         new p2p(2, 1);
     }, 2000);
+    setTimeout(function(){
+        flashPoint(20, true);
+        flashPoint(21, true);
+        flashPoint(300, true);
+    }, 3000);
 };
 </script>
 <div id="map"></div>
