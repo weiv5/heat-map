@@ -88,6 +88,35 @@ window.onload = function(){
             })(json[i]);
         }
     });
+    
+    new p2p([116.4551, 40.2539], [106.6333, 30.4376]);
+    new p2p([116.4551, 40.2539], [110.3467, 41.4899]);
+    setTimeout(function(){
+    new p2p([116.4551, 40.2539], [107.7539, 30.1904]);
+    }, 1000);
+
+    function p2p(p1, p2) {
+        var t = 0,
+            po1 = projection(p1),
+            po2 = projection(p2),
+            nextPo = function(tt) {
+                var x = po1[0]>po2[0] ? po1[0]-(po1[0]-po2[0])*tt : po1[0]+(po2[0]-po1[0])*tt;
+                var y = po1[1]>po2[1] ? po1[1]-(po1[1]-po2[1])*tt : po1[1]+(po2[1]-po1[1])*tt;
+                return [x, y];
+            },
+            path = function(po1, po2) {
+                return "M "+po1[0]+" "+po1[1]+" "+po2[0]+" "+po2[1];
+            },
+            line = paper.path(path(po1, nextPo(t))).attr({"stroke":'green', 'stroke-width':1.2});
+        d3.timer(function(elapsed) {
+            t += 0.02;
+            if (t>=1.01) {
+                return true;
+            } else {
+                line.attr({path: path(po1, nextPo(t))});
+            }
+        });
+    }
 };
 </script>
 <div id="map"></div>
