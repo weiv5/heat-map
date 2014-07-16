@@ -2,103 +2,98 @@
 <script src="d3.js"></script>
 <script src="raphael.min.js"></script>
 <script src="jquery.min.js"></script>
+<script src="data/map.js"></script>
+<script src="data/point.js"></script>
 
 <script>
 window.onload = function(){
     var canvas = document.getElementById("map");
-    var paper = new Raphael(canvas, 1200, 1000);
+    var paper = new Raphael(canvas, 1200, 1000).setViewBox(-1174.6445229087194, -1437.3577680805693, 3039.3970214233723, 2531.19589698184, true);
 
     var projection = d3.geo.albers().origin([105, 30.5]).scale(4000);
     var getAreaPath = d3.geo.path().projection(projection);
 
-    paper.setViewBox(-1174.6445229087194, -1437.3577680805693, 3039.3970214233723, 2531.19589698184, true);
-
-    var colors = d3.scale.linear()
-        .domain([0, 100])
-        .range(["#ffffff", "orange"]);
-
-    d3.json("data/map.js", function(json) {
-        json.features.forEach(function(d) {
-            var state = paper.path(getAreaPath(d));
-            state.attr({
-                "fill": colors(parseInt(d.id)),
-                "stroke": "#aaa"
-            }).toBack();
-        });
-    });
-
-
+    var colors = d3.scale.linear().domain([0, 100]).range(["#ffffff", "orange"]);
     var tooltip = $("<div/>").css({
-            "border": "1px solid",
-            "border-color": $.browser.msie ? "rgb(0, 0, 0)" : "rgba(0, 0, 0, 0.8)",
-            "background-color": $.browser.msie ? "rgb(0, 0, 0)" : "rgba(0, 0, 0, 0.75)",
-            "color": "white",
-            "border-radius": "2px",
-            "padding": "12px 8px",
-            "font-size": "12px",
-            "box-shadow": "3px 3px 6px 0px rgba(0,0,0,0.58)",
-            "font-familiy": "宋体",
-            "z-index": 1000,
-            "text-align": "center",
-            "visibility": "hidden",
-            "position": "absolute"
-        });
+        "border": "1px solid",
+        "border-color": $.browser.msie ? "rgb(0, 0, 0)" : "rgba(0, 0, 0, 0.8)",
+        "background-color": $.browser.msie ? "rgb(0, 0, 0)" : "rgba(0, 0, 0, 0.75)",
+        "color": "white",
+        "border-radius": "2px",
+        "padding": "12px 8px",
+        "font-size": "12px",
+        "box-shadow": "3px 3px 6px 0px rgba(0,0,0,0.58)",
+        "font-familiy": "宋体",
+        "z-index": 1000,
+        "text-align": "center",
+        "visibility": "hidden",
+        "position": "absolute"
+    });
     $("#map").append(tooltip);
     
-    d3.json("data/point.js", function(json){
-        for (var i in json) {
-            (function(city) {
-                var loc = projection(city.loc);
-                paper.circle(loc[0], loc[1], 15)
-                    .attr({
-                        "fill": "steelblue",
-                        "fill-opacity": 0.5,
-                    })
-                    .mouseover(function(){
-                        this.attr({"r": 30});
-                        tooltip.html(city.fullName).css("visibility", "visible");;
-                    })
-                    .mouseout(function(){
-                        this.attr({"r": 15});
-                        tooltip.css("visibility", 'hidden');
-                    })
-                    .mousemove(function (e) {
-                        var offset = tooltip.offset();
-                        if (!(e.pageX && e.pageY)) {
-                            return false;
-                        }
-                        var x = e.pageX,
-                            y = e.pageY,
-                            width =  tooltip.outerWidth ? tooltip.outerWidth() : tooltip.width(),
-                            height =  tooltip.outerHeight ? tooltip.outerHeight() : tooltip.height(),
-                            mouseToNode = 15;
-                        if (width + x + 2 * mouseToNode <=  $(canvas).width()) {
-                            x += mouseToNode;
-                        } else {
-                            x = x - width - mouseToNode;
-                        }   
-                        if (y >= height + mouseToNode) {
-                            y = y - mouseToNode - height;
-                        } else {
-                            y += mouseToNode;
-                        }
-                        tooltip.css("left",  x); 
-                        tooltip.css("top",  y); 
-                    });
-            })(json[i]);
-        }
+    var maps = {};
+    data_map.features.forEach(function(d) {
+        var state = paper.path(getAreaPath(d));
+        state.attr({
+            "fill": colors(parseInt(d.id)),
+            "stroke": "#aaa"
+        }).toBack();
     });
     
-    new p2p([116.4551, 40.2539], [106.6333, 30.4376]);
-    new p2p([116.4551, 40.2539], [110.3467, 41.4899]);
-    setTimeout(function(){
-    new p2p([116.4551, 40.2539], [107.7539, 30.1904]);
-    }, 1000);
+    var points = {};
+    for (var i in data_point) {
+        (function(id, city) {
+            var loc = projection(city.loc);
+            var point = paper.circle(loc[0], loc[1], 15).attr({
+                    "fill": "steelblue",
+                    "fill-opacity": 0.5
+                }).mouseover(function(){
+                    this.attr({"r": 30});
+                    tooltip.html(city.fullName).css("visibility", "visible");;
+                }).mouseout(function(){
+                    this.attr({"r": 15});
+                    tooltip.css("visibility", 'hidden');
+                }).mousemove(function (e) {
+                    var offset = tooltip.offset();
+                    if (!(e.pageX && e.pageY)) {
+                        return false;
+                    }
+                    var x = e.pageX,
+                        y = e.pageY,
+                        width =  tooltip.outerWidth ? tooltip.outerWidth() : tooltip.width(),
+                        height =  tooltip.outerHeight ? tooltip.outerHeight() : tooltip.height(),
+                        mouseToNode = 15;
+                    if (width + x + 2 * mouseToNode <=  $(canvas).width()) {
+                        x += mouseToNode;
+                    } else {
+                        x = x - width - mouseToNode;
+                    }   
+                    if (y >= height + mouseToNode) {
+                        y = y - mouseToNode - height;
+                    } else {
+                        y += mouseToNode;
+                    }
+                    tooltip.css("left",  x); 
+                    tooltip.css("top",  y); 
+                });
+            points[id] = point;
+        })(i, data_point[i]);
+    }
 
-    function p2p(p1, p2) {
+    function flashPoint(id) {
+        points[id].animate({r: 60}, 2000, '', function(){
+            points[id].attr({r:0});
+            flashPoint(id);
+        });
+    }
+
+    function p2p(id1, id2) {
+        if (id1 == id2) {
+            return false;
+        }
         var t = 0,
-            po1 = projection(p1),
-            po2 = projection(p2),
+            po1 = projection(data_point[id1].loc),
+            po2 = projection(data_point[id2].loc),
             nextPo = function(tt) {
                 var x = po1[0]>po2[0] ? po1[0]-(po1[0]-po2[0])*tt : po1[0]+(po2[0]-po1[0])*tt;
                 var y = po1[1]>po2[1] ? po1[1]-(po1[1]-po2[1])*tt : po1[1]+(po2[1]-po1[1])*tt;
@@ -107,16 +102,31 @@ window.onload = function(){
             path = function(po1, po2) {
                 return "M "+po1[0]+" "+po1[1]+" "+po2[0]+" "+po2[1];
             },
-            line = paper.path(path(po1, nextPo(t))).attr({"stroke":'green', 'stroke-width':1.2});
+            line = paper.path(path(po1, nextPo(t))).attr({"stroke":'red', 'stroke-width':1.2});
         d3.timer(function(elapsed) {
             t += 0.02;
             if (t>=1.01) {
+                points[id2].animate({r: 60}, 1000, '', function(){
+                    points[id2].animate({r:15}, 500);
+                });
+                line.attr({"stroke":"steelblue"});
                 return true;
             } else {
                 line.attr({path: path(po1, nextPo(t))});
             }
         });
     }
+    
+    flashPoint(20);
+    new p2p(1, 2);
+    new p2p(1, 50);
+    new p2p(1, 100);
+    new p2p(1, 10);
+    new p2p(1, 70);
+    new p2p(1, 200);
+    setTimeout(function(){
+        new p2p(2, 1);
+    }, 2000);
 };
 </script>
 <div id="map"></div>

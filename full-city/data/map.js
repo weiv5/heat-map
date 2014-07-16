@@ -1,4 +1,4 @@
-{
+var data_map = {
     "type": "FeatureCollection",
     "features": [{
         "type": "Feature",
@@ -3141,4 +3141,4 @@
             ]
         }
     }]
-}
+};
